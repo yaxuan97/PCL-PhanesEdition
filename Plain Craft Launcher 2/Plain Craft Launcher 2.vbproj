@@ -7,7 +7,7 @@
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{F184B08F-C81C-45F6-A57F-5ABD9991F28F}</ProjectTypeGuids>
     <OutputType>WinExe</OutputType>
     <RootNamespace>PCL</RootNamespace>
-    <AssemblyName>Plain Craft Launcher 2</AssemblyName>
+    <AssemblyName>Plain Craft Launcher - Phanes Edition</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <MyType>Custom</MyType>
     <IsWebBootstrapper>false</IsWebBootstrapper>
@@ -40,7 +40,7 @@
     <DefineTrace>false</DefineTrace>
     <IncrementalBuild>true</IncrementalBuild>
     <OutputPath>bin\</OutputPath>
-    <DocumentationFile>Plain Craft Launcher 2.xml</DocumentationFile>
+    <DocumentationFile>Plain Craft Launcher - Phanes Edition.xml</DocumentationFile>
     <NoWarn>41999,42016,42017,42018,42019,42020,42021,42022,42032,42036,42314</NoWarn>
     <Prefer32Bit>false</Prefer32Bit>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
@@ -58,7 +58,7 @@
     <IncrementalBuild>false</IncrementalBuild>
     <Optimize>true</Optimize>
     <OutputPath>bin\</OutputPath>
-    <DocumentationFile>Plain Craft Launcher 2.xml</DocumentationFile>
+    <DocumentationFile>Plain Craft Launcher - Phanes Edition.xml</DocumentationFile>
     <NoWarn>41999,42016,42017,42018,42019,42020,42021,42022,42032,42036,42314</NoWarn>
     <Prefer32Bit>false</Prefer32Bit>
     <CodeAnalysisRuleSet>BasicDesignGuidelineRules.ruleset</CodeAnalysisRuleSet>
@@ -103,7 +103,7 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <OutputPath>bin\</OutputPath>
-    <DocumentationFile>Plain Craft Launcher 2.xml</DocumentationFile>
+    <DocumentationFile>Plain Craft Launcher - Phanes Edition.xml</DocumentationFile>
     <Optimize>true</Optimize>
     <WarningLevel>1</WarningLevel>
     <NoWarn>41999,42016,42017,42018,42019,42020,42021,42022,42032,42036,42314</NoWarn>
@@ -304,9 +304,6 @@
     <Compile Include="Pages\PageLaunch\PageLoginNideSkin.xaml.vb">
       <DependentUpon>PageLoginNideSkin.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Pages\PageLink\PageLinkMain.xaml.vb">
-      <DependentUpon>PageLinkMain.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Pages\PageOther\PageOtherHelpDetail.xaml.vb">
       <DependentUpon>PageOtherHelpDetail.xaml</DependentUpon>
     </Compile>
@@ -380,9 +377,6 @@
     </Compile>
     <Compile Include="Pages\PageSetup\PageSetupSystem.xaml.vb">
       <DependentUpon>PageSetupSystem.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Pages\PageSetup\PageSetupLink.xaml.vb">
-      <DependentUpon>PageSetupLink.xaml</DependentUpon>
     </Compile>
     <Compile Include="Pages\PageSetup\PageSetupUI.xaml.vb">
       <DependentUpon>PageSetupUI.xaml</DependentUpon>
@@ -564,10 +558,6 @@
     <None Include="Resources\Custom.xaml">
       <SubType>Designer</SubType>
     </None>
-    <Page Include="Pages\PageLink\PageLinkMain.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
     <Page Include="Pages\PageOther\PageOtherHelpDetail.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -633,10 +623,6 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Pages\PageSetup\PageSetupSystem.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Pages\PageSetup\PageSetupLink.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

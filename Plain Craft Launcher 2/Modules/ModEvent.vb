@@ -169,8 +169,6 @@ Public Class CustomEvent
         写入设置
         修改变量
         写入变量
-        加入房间
-        检查更新
     End Enum
 
     ''' <summary>
@@ -333,22 +331,8 @@ Public Class CustomEvent
                         Logger.Warn(ex, $"写入变量失败：{Arg0} → {Args(1)}", LogBehavior.Toast)
                     End Try
 
-                Case EventType.加入房间
-                    RunInUi(
-                    Sub()
-                        If String.IsNullOrWhiteSpace(Arg) Then
-                            PageLinkMain.Join()
-                        Else
-                            If Not EventSafetyConfirm("即将加入第三方联机房间。") Then Return
-                            PageLinkMain.Join(Arg)
-                        End If
-                    End Sub)
-
-                Case EventType.检查更新
-                    UpdateCheckByButton()
-
                 Case Else
-                    MyMsgBox("未知的事件类型：" & Type & vbCrLf & "请检查事件类型填写是否正确，或者 PCL 是否为最新版本。", "事件执行失败")
+                    MyMsgBox("未知的事件类型：" & Type & vbCrLf & "请检查事件类型填写是否正确，或者启动器版本是否支持该事件。", "事件执行失败")
             End Select
         Catch ex As Exception
             Logger.Error(ex, $"事件执行失败（{Type}, {Arg}）", LogBehavior.Alert)
@@ -395,20 +379,20 @@ Public Class CustomEvent
         RelativeUrl = RelativeUrl.Replace("/", "\").Lower.TrimStart("\")
 
         '确认实际路径
-        Dim Location As String, WorkingDir As String = Paths.Base & "PCL"
+        Dim Location As String, WorkingDir As String = Paths.Base & DataFolder
         HelpTryExtract()
         If RelativeUrl.Contains(":\") Then
             '绝对路径
             Location = RelativeUrl
             Logger.Info($"自定义事件中由绝对路径{Type}：{Location}")
-        ElseIf FileUtils.Exists(Paths.Base & "PCL\" & RelativeUrl) Then
+        ElseIf FileUtils.Exists(Paths.Base & DataFolder & "\" & RelativeUrl) Then
             '相对 PCL 文件夹的路径
-            Location = Paths.Base & "PCL\" & RelativeUrl
+            Location = Paths.Base & DataFolder & "\" & RelativeUrl
             Logger.Info($"自定义事件中由相对 PCL 文件夹的路径{Type}：{Location}")
-        ElseIf FileUtils.Exists(Paths.Base & "PCL\Help\" & RelativeUrl) Then
+        ElseIf FileUtils.Exists(Paths.Base & DataFolder & "\Help\" & RelativeUrl) Then
             '相对 PCL 本地帮助文件夹的路径
-            Location = Paths.Base & "PCL\Help\" & RelativeUrl
-            WorkingDir = Paths.Base & "PCL\Help\"
+            Location = Paths.Base & DataFolder & "\Help\" & RelativeUrl
+            WorkingDir = Paths.Base & DataFolder & "\Help\"
             Logger.Info($"自定义事件中由相对 PCL 本地帮助文件夹的路径{Type}：{Location}")
         ElseIf Type = EventType.打开帮助 AndAlso FileUtils.Exists(PathTemp & "Help\" & RelativeUrl) Then
             '相对 PCL 自带帮助文件夹的路径

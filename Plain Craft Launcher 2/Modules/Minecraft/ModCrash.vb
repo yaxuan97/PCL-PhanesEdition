@@ -917,11 +917,6 @@ NextStack:
                     Return
                 End Try
         End Select
-        '上报
-        If IsManualAnalyze Then Return
-        Telemetry("Minecraft 崩溃",
-                  "Version", If(TargetInstance Is Nothing, "null", TargetInstance.VersionDisplayName),
-                  "Detail", FilterUserName(Detail, "*"))
     End Sub
     ''' <summary>
     ''' 获取崩溃分析的结果描述。
@@ -955,7 +950,7 @@ NextStack:
                 Case CrashReason.Java版本过高
                     Results.Add("游戏似乎因为你所使用的 Java 版本过高而崩溃了。\n请在版本设置的 Java 选项中改用较低版本的 Java，然后再启动游戏。\n如果没有，可以从网络中下载、安装一个。")
                 Case CrashReason.Java版本不兼容
-                    Results.Add("游戏不兼容你当前使用的 Java。\n请在版本设置的 Java 选项中改用合适版本的 Java，然后再启动游戏。\n如果你没有安装任何 Mod 并且因此崩溃，请向 PCL 提交反馈。")
+                    Results.Add("游戏不兼容你当前使用的 Java。\n请在版本设置的 Java 选项中改用合适版本的 Java，然后再启动游戏。\n如果你没有安装任何 Mod 并且因此崩溃，请向开发者提交反馈。")
                 Case CrashReason.Mod名称包含特殊字符
                     Results.Add("由于有 Mod 的名称包含特殊字符，导致游戏崩溃。\n请尝试修改 Mod 文件名，让它只包含英文字母、数字、减号（-）、下划线（_）和小数点，然后再启动游戏。")
                 Case CrashReason.MixinBootstrap缺失
@@ -1103,7 +1098,7 @@ NextStack:
                 Case CrashReason.没有可用的分析文件
                     Results.Add("你的游戏出现了一些问题，但 PCL 未能找到相关记录文件，因此无法进行分析。\h")
                 Case Else
-                    Results.Add("PCL 获取到了没有详细信息的错误原因（" & CrashReasons.First.Key & "），请向 PCL 作者提交反馈以获取详情。\h")
+                    Results.Add("PCL 获取到了没有详细信息的错误原因（" & CrashReasons.First.Key & "），请向开发者提交反馈以获取详情。\h")
             End Select
         Next
 
@@ -1114,9 +1109,7 @@ NextStack:
                     ReplaceLineEndings(vbCrLf).
                     Trim(vbCrLf.ToCharArray) &
                 If(Not Results.Any(Function(r) r.EndsWithF("\h")) OrElse IsHandAnalyze, "",
-                    vbCrLf & "如果要寻求帮助，请把错误报告文件发给对方，而不是发送这个窗口的照片或者截图。" &
-                    If(If(PageSetupSystem.IsLauncherNewest(), True), "",
-                    vbCrLf & vbCrLf & "此外，你正在使用老版本 PCL，更新 PCL 或许也能解决这个问题。" & vbCrLf & "你可以点击 [设置 → 其他 → 启动器 → 检查更新] 更新 PCL。"))
+                    vbCrLf & "如果要寻求帮助，请把错误报告文件发给对方，而不是发送这个窗口的照片或者截图。")
     End Function
 
 End Class

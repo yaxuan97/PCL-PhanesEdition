@@ -2010,7 +2010,7 @@ Retry:
                 If NewInstance Is Nothing Then NewInstance = New McInstance(Instance.PathVersion).Load()
                 RunInUiWait(
                 Sub()
-                    WriteIni(McFolderSelected & "PCL.ini", "InstanceCache", "")
+                    WriteIni(McFolderSelected & "PCL-Phanes.ini", "InstanceCache", "")
                     '未切换则选中修改后的版本
                     If PageInstanceLeft.Instance IsNot Nothing AndAlso
                        PathUtils.IsSame(PageInstanceLeft.Instance.PathVersion, Instance.PathVersion) Then
@@ -2130,7 +2130,7 @@ Retry:
     Public Sub McInstallState(Loader As LoaderBase)
         Select Case Loader.State
             Case LoadState.Finished
-                WriteIni(McFolderSelected & "PCL.ini", "InstanceCache", "") '清空缓存（合并安装会先生成文件夹，这会在刷新时误判为可以使用缓存）
+                WriteIni(McFolderSelected & "PCL-Phanes.ini", "InstanceCache", "") '清空缓存（合并安装会先生成文件夹，这会在刷新时误判为可以使用缓存）
                 Hint(Loader.Name & "成功！", HintType.Green)
                 'TODO: 自动选择安装成功的版本
             Case LoadState.Failed

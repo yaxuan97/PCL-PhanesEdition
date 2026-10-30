@@ -63,7 +63,7 @@ Public Class PageLaunchLeft
                 End Try
             End If
             '确认 Minecraft 版本存在
-            Dim Selection As String = ReadIni(McFolderSelected & "PCL.ini", "Version")
+            Dim Selection As String = ReadIni(McFolderSelected & "PCL-Phanes.ini", "Version")
             Dim Instance As McInstance = If(Selection = "", Nothing, New McInstance(Selection))
             If Instance Is Nothing OrElse Not PathUtils.IsParentOf(McFolderSelected, Instance.PathVersion) OrElse Not Instance.Check() Then
                 '无效的版本
@@ -613,7 +613,6 @@ Finish:
             (FrmMain.PageRight IsNot Nothing AndAlso FrmMain.PageRight.PageState <> MyPageRight.PageStates.ContentStay AndAlso FrmMain.PageRight.PageState <> MyPageRight.PageStates.ContentEnter) Then Return
         '愚人节处理
         If IsAprilEnabled AndAlso Not IsAprilGiveup Then
-            ThemeUnlock(12, False, "隐藏主题 滑稽彩 已解锁！")
             IsAprilGiveup = True
             Settings.Set("AprilYear", Date.Now.Year)
             FrmLaunchLeft.AprilScaleTrans.ScaleX = 1

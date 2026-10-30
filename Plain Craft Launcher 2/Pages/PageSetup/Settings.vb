@@ -3,13 +3,10 @@ Imports System.Security.Cryptography
 Public Class Settings
 
     Public Shared ReadOnly Entries As Dictionary(Of String, Setting) = (New List(Of Setting) From {
-        New Setting("Identify", "", Source:=Sources.Registry),
         New Setting("WindowHeight", 550),
         New Setting("WindowWidth", 900),
         New Setting("AprilYear", 0, Source:=Sources.Registry, Encrypted:=True),
-        New Setting("Potatoes", "", Source:=Sources.Registry, Encrypted:=True),
         New Setting("HintDownloadThread", False, Source:=Sources.Registry),
-        New Setting("HintNotice", 0, Source:=Sources.Registry),
         New Setting("HintDownload", 0, Source:=Sources.Registry),
         New Setting("HintHide", False, Source:=Sources.Registry),
         New Setting("HintHandInstall", False, Source:=Sources.Registry),
@@ -21,9 +18,7 @@ Public Class Settings
         New Setting("HintMoreAdvancedSetup", False, Source:=Sources.Registry),
         New Setting("HintIndieSetup", False, Source:=Sources.Registry),
         New Setting("HintExportConfig", False, Source:=Sources.Registry),
-        New Setting("HintSnapshot", False, Source:=Sources.Registry),
         New Setting("SystemEulaVersion", 0, Source:=Sources.Registry),
-        New Setting("SystemCount", 0, Source:=Sources.Registry, Encrypted:=True),
         New Setting("SystemLaunchCount", 0, Source:=Sources.Registry, Encrypted:=True),
         New Setting("SystemLastVersionReg", 0, Source:=Sources.Registry, Encrypted:=True),
         New Setting("SystemHighestSavedBetaVersionReg", 0, Source:=Sources.Registry, Encrypted:=True),
@@ -35,9 +30,6 @@ Public Class Settings
         New Setting("SystemDebugDelay", False, Source:=Sources.Registry),
         New Setting("SystemDebugSkipCopy", False, Source:=Sources.Registry),
         New Setting("SystemSystemCache", "", Source:=Sources.Registry),
-        New Setting("SystemSystemUpdate", 0),
-        New Setting("SystemSystemActivity", 0),
-        New Setting("SystemSystemTelemetry", True, Source:=Sources.Registry),
         New Setting("CacheDrops", "", Source:=Sources.Registry),
         New Setting("CacheConfig", 0, Source:=Sources.Registry),
         New Setting("CacheExportConfig", "", Source:=Sources.Registry),
@@ -88,7 +80,7 @@ Public Class Settings
         New Setting("LaunchFolderSelect", ""),
         New Setting("LaunchFolders", "", Source:=Sources.Registry),
         New Setting("LaunchArgumentTitle", ""),
-        New Setting("LaunchArgumentInfo", "PCL"),
+        New Setting("LaunchArgumentInfo", "PCL-Phanes"),
         New Setting("LaunchArgumentJavaSelect", "", Source:=Sources.Registry),
         New Setting("LaunchArgumentJavaAll", "[]", Source:=Sources.Registry),
         New Setting("LaunchArgumentIndie", 0),
@@ -109,10 +101,6 @@ Public Class Settings
         New Setting("LaunchAdvanceGC", 4),
         New Setting("LaunchRamType", 0, OnChanged:=AddressOf PageSetupLaunch.UpdateRamType),
         New Setting("LaunchRamCustom", 15),
-        New Setting("LinkLastAutoJoinInviteCode", "", Source:=Sources.Registry),
-        New Setting("LinkLatencyMode", 0, Source:=Sources.Registry),
-        New Setting("LinkCustomPeer", ""),
-        New Setting("LinkEasyTierVersion", -1, Source:=Sources.Registry),
         New Setting("ToolHelpChinese", True, Source:=Sources.Registry),
         New Setting("ToolDownloadThread", 63, Source:=Sources.Registry),
         New Setting("ToolDownloadSpeed", 42, Source:=Sources.Registry, OnChanged:=AddressOf ModNet.UpdateNetTaskSpeedLimitHigh),
@@ -128,13 +116,7 @@ Public Class Settings
         New Setting("ToolUpdateReleaseLast", "", Source:=Sources.Registry),
         New Setting("ToolUpdateSnapshotLast", "", Source:=Sources.Registry),
         New Setting("UiLauncherTransparent", 600, OnChanged:=Sub(Value As Integer) If FrmMain IsNot Nothing Then FrmMain.Opacity = Value / 1000 + 0.4), '避免与 PCL1 设置冲突（UiLauncherOpacity）
-        New Setting("UiLauncherHue", 180),
-        New Setting("UiLauncherSat", 80),
-        New Setting("UiLauncherDelta", 90),
-        New Setting("UiLauncherLight", 20),
         New Setting("UiLauncherTheme", 0, OnChanged:=AddressOf ThemeRefresh),
-        New Setting("UiLauncherThemeHide", "0|1|2|3|4", Source:=Sources.Registry, Encrypted:=True),
-        New Setting("UiLauncherThemeHide2", "0|1|2|3|4", Source:=Sources.Registry, Encrypted:=True),
         New Setting("UiLauncherLogo", True),
         New Setting("UiLauncherEmail", False),
         New Setting("UiBackgroundColorful", True, OnChanged:=Sub() ThemeRefresh()), '不传入参数
@@ -153,7 +135,6 @@ Public Class Settings
         New Setting("UiMusicRandom", True),
         New Setting("UiMusicAuto", True),
         New Setting("UiHiddenPageDownload", False, OnChanged:=AddressOf PageSetupUI.HiddenRefresh),
-        New Setting("UiHiddenPageLink", False, OnChanged:=AddressOf PageSetupUI.HiddenRefresh),
         New Setting("UiHiddenPageSetup", False, OnChanged:=AddressOf PageSetupUI.HiddenRefresh),
         New Setting("UiHiddenPageOther", False, OnChanged:=AddressOf PageSetupUI.HiddenRefresh),
         New Setting("UiHiddenFunctionSelect", False, OnChanged:=AddressOf PageSetupUI.HiddenRefresh),
@@ -162,11 +143,8 @@ Public Class Settings
         New Setting("UiHiddenFunctionHidden", False, OnChanged:=AddressOf PageSetupUI.HiddenRefresh),
         New Setting("UiHiddenSetupLaunch", False, OnChanged:=AddressOf PageSetupUI.HiddenRefresh),
         New Setting("UiHiddenSetupUi", False, OnChanged:=AddressOf PageSetupUI.HiddenRefresh),
-        New Setting("UiHiddenSetupLink", False, OnChanged:=AddressOf PageSetupUI.HiddenRefresh),
         New Setting("UiHiddenSetupSystem", False, OnChanged:=AddressOf PageSetupUI.HiddenRefresh),
         New Setting("UiHiddenOtherHelp", False, OnChanged:=AddressOf PageSetupUI.HiddenRefresh),
-        New Setting("UiHiddenOtherFeedback", False, OnChanged:=AddressOf PageSetupUI.HiddenRefresh),
-        New Setting("UiHiddenOtherVote", False, OnChanged:=AddressOf PageSetupUI.HiddenRefresh),
         New Setting("UiHiddenOtherAbout", False, OnChanged:=AddressOf PageSetupUI.HiddenRefresh),
         New Setting("UiHiddenOtherTest", False, OnChanged:=AddressOf PageSetupUI.HiddenRefresh),
         New Setting("VersionAdvanceJvm", "", Source:=Sources.Instance),
@@ -252,7 +230,7 @@ Public Class Settings
             If Encrypted Then
                 Try
                     If Value Is Nothing Then Value = ""
-                    Value = DesEncrypt(Value, "PCL" & Identify)
+                    Value = DesEncrypt(Value, "PCL-Phanes")
                 Catch ex As Exception
                     Logger.Warn(ex, $"加密设置失败：{Key}")
                 End Try
@@ -313,20 +291,10 @@ Public Class Settings
         If Not Entries.TryGetValue(Key, Entry) Then Throw New KeyNotFoundException("未找到设置项：" & Key)
         Dim Value = Entry.GetCache(Instance)
         If Value IsNot Nothing Then Return Value
-        '对部分设置强制赋值
-        Static ForcedSettings As New Dictionary(Of String, Object) From {
-            {"UiHiddenPageLink", True},
-            {"UiHiddenSetupLink", True}
-        }
-        Dim ForcedSetting As Object = Nothing
-        If ForcedSettings.TryGetValue(Key, ForcedSetting) Then
-            Entry.Set(ForcedSetting, Instance)
-            Return ForcedSetting
-        End If
         '正常读取
         Try
             Dim GotValue As String = Nothing '先用 String 储存，避免类型转换
-            Dim DefaultValue As String = If(Entry.Encrypted, DesEncrypt(Entry.DefaultValue, "PCL" & Identify), Entry.DefaultValue)
+            Dim DefaultValue As String = If(Entry.Encrypted, DesEncrypt(Entry.DefaultValue, "PCL-Phanes"), Entry.DefaultValue)
             Select Case Entry.Source
                 Case Sources.Normal
                     GotValue = ReadIni("Setup", Key, DefaultValue)
@@ -344,7 +312,7 @@ Public Class Settings
                     GotValue = Entry.DefaultValue
                 Else
                     Try
-                        GotValue = DesDecrypt(GotValue, "PCL" & Identify)
+                        GotValue = DesDecrypt(GotValue, "PCL-Phanes")
                     Catch ex As Exception
                         Logger.Warn(ex, $"解密设置失败：{Key}")
                         GotValue = Entry.DefaultValue

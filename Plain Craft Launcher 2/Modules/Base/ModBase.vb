@@ -5,14 +5,12 @@ Public Module ModBase
 
 #Region "声明"
 
-    '下列版本信息由更新器自动修改
-    Public Const VersionBaseName As String = "2.14.0.0" '显示用版本名
-    Public Const CommitHash As String = "" 'Commit Hash，由 GitHub Workflow 自动替换
-#If RELEASE Then
-    Public Const VersionCode As Integer = 411 '正式版
-#Else
-    Public Const VersionCode As Integer = 412 '快照版
-#End If
+    '下列版本信息由构建脚本自动修改
+    Public Const VersionBaseName As String = "1.0.0" '显示用版本名
+    Public Const CommitHash As String = "" 'Commit Hash，由构建脚本自动替换
+    Public Const VersionCode As Integer = 1
+    '本项目的启动器数据文件夹名
+    Public Const DataFolder As String = "PCL-Phanes"
 
     '版本信息
     Public Const VersionDisplay As String = BuildTypeDisplay & " " & VersionBaseName
@@ -43,11 +41,11 @@ Public Module ModBase
     ''' <summary>
     ''' 程序内嵌图片文件夹路径，以 / 结尾。
     ''' </summary>
-    Public PathImage As String = "pack://application:,,,/Plain Craft Launcher 2;component/Images/"
+    Public PathImage As String = "pack://application:,,,/Plain Craft Launcher - Phanes Edition;component/Images/"
     ''' <summary>
     ''' 程序的缓存文件夹路径，以 \ 结尾。
     ''' </summary>
-    Public PathTemp As String = PathUtils.AddSlashSuffix(If(Settings.Get(Of String)("SystemSystemCache") = "", Path.GetTempPath() & "PCL\", Settings.Get(Of String)("SystemSystemCache")).Replace("/", "\"))
+    Public PathTemp As String = PathUtils.AddSlashSuffix(If(Settings.Get(Of String)("SystemSystemCache") = "", Path.GetTempPath() & DataFolder & "\", Settings.Get(Of String)("SystemSystemCache")).Replace("/", "\"))
     ''' <summary>
     ''' 当前程序的语言。
     ''' </summary>
@@ -60,10 +58,6 @@ Public Module ModBase
     ''' 程序打开时的时间。
     ''' </summary>
     Public ApplicationOpenTime As Date = Date.Now
-    ''' <summary>
-    ''' 识别码。
-    ''' </summary>
-    Public Identify As String = GetIdentify()
     ''' <summary>
     ''' 程序是否正在结束。
     ''' </summary>
@@ -473,7 +467,7 @@ Public Module ModBase
     ''' </summary>
     ''' <param name="FileName">文件完整路径或简写文件名。简写将会使用“ApplicationName\文件名.ini”作为路径。</param>
     Public Sub IniClearCache(FileName As String)
-        If Not FileName.Contains(":\") Then FileName = $"{Paths.Base}PCL\{FileName}.ini"
+        If Not FileName.Contains(":\") Then FileName = $"{Paths.Base}{DataFolder}\{FileName}.ini"
         IniCache.Remove(FileName)
     End Sub
     ''' <summary>
@@ -484,7 +478,7 @@ Public Module ModBase
     Private Function IniGetContent(FileName As String) As ConcurrentDictionary(Of String, String)
         Try
             '还原文件路径
-            If Not FileName.Contains(":\") Then FileName = $"{Paths.Base}PCL\{FileName}.ini"
+            If Not FileName.Contains(":\") Then FileName = $"{Paths.Base}{DataFolder}\{FileName}.ini"
             '检索缓存
             Dim Cache As ConcurrentDictionary(Of String, String) = Nothing
             If IniCache.TryGetValue(FileName, Cache) Then Return Cache
@@ -558,7 +552,7 @@ Public Module ModBase
                 FileContent.Append(Pair.Value)
                 FileContent.Append(vbCrLf)
             Next
-            If Not FileName.Contains(":\") Then FileName = $"{Paths.Base}PCL\{FileName}.ini"
+            If Not FileName.Contains(":\") Then FileName = $"{Paths.Base}{DataFolder}\{FileName}.ini"
             '处理相对路径
             FileName = If(FileName.Contains(":\"), FileName, Paths.Base & FileName)
             FileUtils.Write(FileName, FileContent.ToString)
@@ -791,13 +785,13 @@ Public Module ModBase
     Public PathPure As New Lazy(Of String)(
     Function()
         If Paths.Base.IsAsciiOnly() Then
-            Return Paths.Base & "PCL\"
+            Return Paths.Base & DataFolder & "\"
         ElseIf Paths.AppDataThenName.IsAsciiOnly() Then
             Return Paths.AppDataThenName
         ElseIf PathTemp.IsAsciiOnly() Then
             Return PathTemp
         Else
-            Return OsDrive & "ProgramData\PCL\"
+            Return OsDrive & "ProgramData\" & DataFolder & "\"
         End If
     End Function)
 

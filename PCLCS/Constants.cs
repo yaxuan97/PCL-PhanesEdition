@@ -49,22 +49,9 @@ public enum ModLoaders {
 }
 
 /// <summary>
-/// 在爱发电中的赞助等级。
+/// 版本管理中使用的缓存版本号。
 /// </summary>
-public enum DonationRank {
-    None = 0,
-    Rank6 = 6,
-    Rank12 = 12,
-    Rank23 = 23,
-    Rank54 = 54,
-    Rank98 = 98,
-}
-
 public static class Versions {
-    /// <summary>
-    /// 土豆码版本号。
-    /// </summary>
-    public const char PotatoVersion = '1';
     /// <summary>
     /// 版本管理中 Mod 信息缓存的版本号。
     /// </summary>

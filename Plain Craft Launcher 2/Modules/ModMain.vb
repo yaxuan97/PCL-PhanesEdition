@@ -373,9 +373,6 @@ EndHint:
     Public FrmSpeedLeft As PageSpeedLeft
     Public FrmSpeedRight As PageSpeedRight
 
-    '联机页面声明
-    Public FrmLinkMain As PageLinkMain
-
     '下载页面声明
     Public FrmDownloadLeft As PageDownloadLeft
     Public FrmDownloadInstall As PageDownloadInstall
@@ -390,7 +387,6 @@ EndHint:
     Public FrmSetupLaunch As PageSetupLaunch
     Public FrmSetupUI As PageSetupUI
     Public FrmSetupSystem As PageSetupSystem
-    Public FrmSetupLink As PageSetupLink
 
     '其他页面声明
     Public FrmOtherLeft As PageOtherLeft
@@ -576,8 +572,8 @@ EndHint:
                 Try
                     Dim IgnoreList As New List(Of String)
                     '读取自定义文件
-                    If DirectoryUtils.Exists(Paths.Base & "PCL\Help\") Then
-                        For Each File In DirectoryUtils.EnumerateFiles(Paths.Base & "PCL\Help\", True)
+                    If DirectoryUtils.Exists(Paths.Base & DataFolder & "\Help\") Then
+                        For Each File In DirectoryUtils.EnumerateFiles(Paths.Base & DataFolder & "\Help\", True)
                             Select Case PathUtils.GetExtension(File)
                                 Case "helpignore"
                                     '加载忽略列表
@@ -834,8 +830,6 @@ NextFile:
         Text = Text.Replace("{pcl_version_code}", Replacer(VersionCode))
         Text = Text.Replace("{pcl_version_branch}", Replacer(BuildTypeDisplay))
         Text = Text.Replace("{pcl_build_type}", Replacer(BuildType.ToString))
-        Text = Text.Replace("{pcl_branch}", Replacer(VersionBranchMain))
-        Text = Text.Replace("{identify}", Replacer(Identify))
         Text = Text.Replace("{path}", Replacer(Paths.Base))
         Text = Text.Replace("{path_with_name}", Replacer(PathExe))
         Text = Text.Replace("{path_temp}", Replacer(PathTemp))
@@ -917,7 +911,7 @@ NextFile:
             IsTaskTempClearing = True
             Try
                 Logger.Info("开始清理任务缓存文件夹")
-                DirectoryUtils.Delete($"{OsDrive}ProgramData\PCL\TaskTemp\")
+                DirectoryUtils.Delete($"{OsDrive}ProgramData\{DataFolder}\TaskTemp\")
                 DirectoryUtils.Delete($"{PathTemp}TaskTemp\")
                 Logger.Info("已清理任务缓存文件夹")
             Catch ex As Exception
@@ -950,7 +944,7 @@ NextFile:
         Catch
         End Try
         '使用备用路径
-        ResultFolder = $"{OsDrive}ProgramData\PCL\TaskTemp\{GetUuid()}-{RandomInteger(0, 1000000)}\"
+        ResultFolder = $"{OsDrive}ProgramData\{DataFolder}\TaskTemp\{GetUuid()}-{RandomInteger(0, 1000000)}\"
         DirectoryUtils.Create(ResultFolder)
         CheckPermission(ResultFolder)
         Return ResultFolder
@@ -958,16 +952,15 @@ NextFile:
 
 #End Region
 
-#Region "反馈与遥测"
+#Region "反馈"
 
     '反馈
     Public Sub Feedback(Optional ShowMsgbox As Boolean = True, Optional ForceOpenLog As Boolean = False)
         On Error Resume Next
         FeedbackInfo()
-        If ForceOpenLog OrElse (ShowMsgbox AndAlso MyMsgBox("若你在汇报一个 Bug，请点击 打开文件夹 按钮，并上传 Log(1~5).txt 中包含错误信息的文件。" & vbCrLf & "游戏崩溃一般与启动器无关，请不要因为游戏崩溃而提交反馈。", "反馈提交提醒", "打开文件夹", "不需要") = 1) Then
-            OpenExplorer(Paths.Base & "PCL\Log1.txt")
+        If ForceOpenLog OrElse (ShowMsgbox AndAlso MyMsgBox("若你在汇报一个 Bug，请点击 打开文件夹 按钮，并附上 Log(1~5).txt 中包含错误信息的文件。" & vbCrLf & "游戏崩溃一般与启动器无关，请不要因为游戏崩溃而提交反馈。", "反馈提示", "打开文件夹", "不需要") = 1) Then
+            OpenExplorer(Paths.Base & DataFolder & "\Log1.txt")
         End If
-        OpenWebsite("https://github.com/Meloong-Git/PCL/issues/")
     End Sub
     ''' <summary>
     ''' 在日志中输出系统诊断信息。
@@ -982,26 +975,6 @@ NextFile:
             "文件位置：" & Paths.Base)
     End Sub
 
-    '遥测
-    Public Sub Telemetry([Event] As String, ParamArray Datas As String())
-        If BuildType = BuildTypes.Debug Then Return '开发版不上传遥测
-        If Not Settings.Get(Of Boolean)("SystemSystemTelemetry") Then Return '用户关闭了遥测
-        If Not ClsBaseUrl.StartsWithF("http") Then Return '开源版没有设置遥测地址
-        RunInNewThread(
-        Sub()
-            Try
-                Logger.Info($"匿名数据上报：{[Event]}")
-                Dim Url As String = $"{ClsBaseUrl}&Event={StringUtils.UrlEscape([Event])}"
-                For i = 0 To Datas.Length - 1 Step 2
-                    Url &= "&" & StringUtils.UrlEscape(Datas(i)) & "=" & StringUtils.UrlEscape(Datas(i + 1).ReplaceLineEndings(vbLf, mergeMultiple:=True))
-                Next
-                NetRequestByClient(Url, MakeLog:=False)
-            Catch ex As Exception
-                Logger.Warn(ex, "匿名数据上报失败")
-            End Try
-        End Sub, "Telemetry", ThreadPriority.Lowest)
-    End Sub
-
 #End Region
 
     Public DragControl = Nothing
@@ -1014,7 +987,6 @@ NextFile:
             MyMsgBoxTick()
             FrmMain.DragTick()
             LoaderTaskbarProgressRefresh()
-            If ThemeDontClick = 2 Then ThemeRefresh()
 #End Region
         Catch ex As Exception
             Logger.Error(ex, "短程主时钟执行异常", LogBehavior.AlertThenCrash)

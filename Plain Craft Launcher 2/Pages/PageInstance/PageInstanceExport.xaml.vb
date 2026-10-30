@@ -473,18 +473,6 @@ Public Class PageInstanceExport
         '构造步骤加载器
         Dim Loaders As New List(Of LoaderBase)
 
-#Region "准备 PCL 文件"
-
-        If BuildType <> BuildTypes.Release AndAlso IncludePCL Then
-            Loaders.Add(New LoaderTask(Of Integer, Integer)("下载 PCL 正式版",
-            Sub(Loader As LoaderTask(Of Integer, Integer))
-                DownloadLatestPCL(Loader)
-                FileUtils.Copy(PathTemp & "Latest.exe", CacheFolder & "Plain Craft Launcher.exe")
-            End Sub) With {.ProgressWeight = 0.5, .Block = False})
-        End If
-
-#End Region
-
 #Region "复制文件"
 
         Loaders.Add(New LoaderTask(Of Integer, List(Of LocalResourceFile))("复制导出内容",
@@ -565,17 +553,17 @@ Public Class PageInstanceExport
             '复制 PCL 版本设置
             If DirectoryUtils.Exists(TargetInstance.PathVersion & "PCL\") Then DirectoryUtils.Copy(TargetInstance.PathVersion & "PCL\", OverridesFolder & "PCL\")
             WriteIni(OverridesFolder & "PCL\Setup.ini", "IsStar", False)
-            '复制 PCL 本体（正式版）
-            If BuildType = BuildTypes.Release AndAlso IncludePCL Then FileUtils.Copy(PathExe, CacheFolder & "Plain Craft Launcher.exe")
+            '复制 PCL 本体
+            If IncludePCL Then FileUtils.Copy(PathExe, CacheFolder & "Plain Craft Launcher - Phanes Edition.exe")
             '复制 PCL 个性化内容
             If IncludePCLCustom Then
-                If DirectoryUtils.Exists(Paths.Base & "PCL\Pictures\") Then DirectoryUtils.Copy(Paths.Base & "PCL\Pictures\", CacheFolder & "PCL\Pictures\")
-                If DirectoryUtils.Exists(Paths.Base & "PCL\Musics\") Then DirectoryUtils.Copy(Paths.Base & "PCL\Musics\", CacheFolder & "PCL\Musics\")
-                If DirectoryUtils.Exists(Paths.Base & "PCL\Help\") Then DirectoryUtils.Copy(Paths.Base & "PCL\Help\", CacheFolder & "PCL\Help\")
-                If FileUtils.Exists(Paths.Base & "PCL\Custom.xaml") Then FileUtils.Copy(Paths.Base & "PCL\Custom.xaml", CacheFolder & "PCL\Custom.xaml")
-                If FileUtils.Exists(Paths.Base & "PCL\Setup.ini") Then FileUtils.Copy(Paths.Base & "PCL\Setup.ini", CacheFolder & "PCL\Setup.ini")
-                If FileUtils.Exists(Paths.Base & "PCL\hints.txt") Then FileUtils.Copy(Paths.Base & "PCL\hints.txt", CacheFolder & "PCL\hints.txt")
-                If FileUtils.Exists(Paths.Base & "PCL\Logo.png") Then FileUtils.Copy(Paths.Base & "PCL\Logo.png", CacheFolder & "PCL\Logo.png")
+                If DirectoryUtils.Exists(Paths.Base & DataFolder & "\Pictures\") Then DirectoryUtils.Copy(Paths.Base & DataFolder & "\Pictures\", CacheFolder & DataFolder & "\Pictures\")
+                If DirectoryUtils.Exists(Paths.Base & DataFolder & "\Musics\") Then DirectoryUtils.Copy(Paths.Base & DataFolder & "\Musics\", CacheFolder & DataFolder & "\Musics\")
+                If DirectoryUtils.Exists(Paths.Base & DataFolder & "\Help\") Then DirectoryUtils.Copy(Paths.Base & DataFolder & "\Help\", CacheFolder & DataFolder & "\Help\")
+                If FileUtils.Exists(Paths.Base & DataFolder & "\Custom.xaml") Then FileUtils.Copy(Paths.Base & DataFolder & "\Custom.xaml", CacheFolder & DataFolder & "\Custom.xaml")
+                If FileUtils.Exists(Paths.Base & DataFolder & "\Setup.ini") Then FileUtils.Copy(Paths.Base & DataFolder & "\Setup.ini", CacheFolder & DataFolder & "\Setup.ini")
+                If FileUtils.Exists(Paths.Base & DataFolder & "\hints.txt") Then FileUtils.Copy(Paths.Base & DataFolder & "\hints.txt", CacheFolder & DataFolder & "\hints.txt")
+                If FileUtils.Exists(Paths.Base & DataFolder & "\Logo.png") Then FileUtils.Copy(Paths.Base & DataFolder & "\Logo.png", CacheFolder & DataFolder & "\Logo.png")
             End If
         End Sub) With {.ProgressWeight = 5})
 

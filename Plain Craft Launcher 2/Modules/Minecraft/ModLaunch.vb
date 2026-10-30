@@ -160,12 +160,6 @@ Public Module ModLaunch
             Select Case LaunchLoader.State
                 Case LoadState.Finished
                     Hint(McInstanceSelected.Name & " 启动成功！", HintType.Green)
-                    '上报
-                    If Not IsSavingBatch Then
-                        Telemetry("Minecraft 启动成功",
-                              "Version", McInstanceSelected.VersionDisplayName,
-                              "LoginType", Settings.Get(Of McLoginType)("LoginType").ToString)
-                    End If
                 Case LoadState.Canceled
                     If CanceledHint Is Nothing Then
                         Hint(If(IsSavingBatch, "已取消导出启动脚本！", "已取消启动！"), HintType.Blue)
@@ -193,13 +187,6 @@ NextInner:
                 '没有特殊处理过的错误信息
                 McLaunchLog("错误：" & ex.GetDisplay(True))
                 Logger.Error(ex, If(IsSavingBatch, "导出启动脚本失败", "Minecraft 启动失败"), LogBehavior.Alert)
-                '上报
-                If Not IsSavingBatch Then
-                    Telemetry("Minecraft 启动失败",
-                              "Version", McInstanceSelected.VersionDisplayName,
-                              "LoginType", Settings.Get(Of McLoginType)("LoginType").ToString,
-                              "Exception", FilterUserName(FilterAccessToken(ex.GetDisplay(True), "*"), "*"))
-                End If
                 Throw
             End If
         End Try
@@ -244,21 +231,6 @@ NextInner:
         Dim CheckResult As String = ""
         RunInUiWait(Sub() CheckResult = McLoginAble(McLoginInput()))
         If CheckResult <> "" Then Throw New ArgumentException(CheckResult)
-        '求赞助
-        If BuildType = BuildTypes.Release AndAlso CurrentLaunchOptions?.SaveBatch Is Nothing Then '保存脚本时不提示
-            RunInNewThread(
-            Sub()
-                Select Case Settings.Get(Of Integer)("SystemLaunchCount")
-                    Case 10, 20, 40, 60, 80, 100, 120, 150, 200, 250, 300, 350, 400, 500, 600, 700, 800, 900, 1000, 1200, 1400, 1600, 1800, 2000
-                        If MyMsgBox("PCL 已经为你启动了 " & Settings.Get(Of Integer)("SystemLaunchCount") & " 次游戏啦！" & vbCrLf &
-                                    "如果 PCL 还算好用的话，能不能考虑赞助一下 PCL……" & vbCrLf &
-                                    "如果没有大家的支持，PCL 很难在免费、无任何广告的情况下维持数年的更新（磕头）……！",
-                                    Settings.Get(Of Integer)("SystemLaunchCount") & " 次启动！", "支持 PCL！", "但是我拒绝") = 1 Then
-                            OpenWebsite("https://meloong.com/afd/a/LTCat")
-                        End If
-                End Select
-            End Sub, "Donate")
-        End If
         '正版购买提示
         If CurrentLaunchOptions?.SaveBatch Is Nothing AndAlso '保存脚本时不提示
            Not Settings.Get(Of Boolean)("HintBuy") AndAlso Settings.Get(Of McLoginType)("LoginType") <> McLoginType.Ms Then
@@ -606,7 +578,6 @@ Relogin:
 SkipLogin:
         McLaunchLog($"微软登录结束，AccessToken 将在 {DateTimeOffset.FromUnixTimeSeconds(ExpiresAt).LocalDateTime} 过期")
         Settings.Set("HintBuy", True) '关闭正版购买提示
-        If ThemeUnlock(10, False) Then MyMsgBox("感谢你对正版游戏的支持！" & vbCrLf & "隐藏主题 跳票红 已解锁！", "提示")
     End Sub
     Private Sub McLoginServerStart(Data As LoaderTask(Of McLoginServer, McLoginResult))
         Dim Input As McLoginServer = Data.Input
@@ -1510,7 +1481,7 @@ NextInstance:
         Yield ("${library_directory}", PathUtils.ToShortPath(McFolderSelected & "libraries"))
         Yield ("${libraries_directory}", PathUtils.ToShortPath(McFolderSelected & "libraries"))
         Yield ("${pure_directory}", PathUtils.RemoveSlashSuffix(PathPure.Value)) '由 PCL 添加，这会允许在分割参数并去重后再替换路径，防止路径中的特殊字符影响参数分割和去重
-        Yield ("${launcher_name}", "PCL")
+        Yield ("${launcher_name}", "PCL-Phanes")
         Yield ("${launcher_version}", VersionCode)
         Yield ("${version_name}", McInstanceSelected.Name)
         Yield ("${game_directory}", PathUtils.ToShortPath(Left(McInstanceSelected.PathIndie, McInstanceSelected.PathIndie.Count - 1)))
@@ -1729,7 +1700,7 @@ NextInstance:
         If Not (IsGBKEncoding OrElse Result.IsAsciiOnly()) Then
             Result = Paths.AppData & ".minecraft\bin\natives\"
             If Not Result.IsAsciiOnly() Then
-                Result = OsDrive & "ProgramData\PCL\natives\"
+                Result = OsDrive & "ProgramData\" & DataFolder & "\natives\"
             End If
         End If
         DirectoryUtils.Create(Result) '提前创建，这样 DirectoryUtils.Shorten 才有结果（否则在长路径下首次启动 Forge 会崩溃）
@@ -1933,7 +1904,7 @@ NextInstance:
                     McLaunchLog("该 Minecraft 版本不支持双层皮肤，已进行裁剪")
                     Skin = Skin.Clip(0, 0, 64, 32)
                 End If
-                Skin.Save(Paths.Base & "PCL\CustomSkin_Cliped.png")
+                Skin.Save(Paths.Base & DataFolder & "\CustomSkin_Cliped.png")
                 '构建压缩文件
                 Dim FilesToCompress As New Dictionary(Of String, String) From {
                     {"pack.mcmeta", MetaFileAddress}, {"pack.png", PackPicAddress}}
@@ -1942,15 +1913,15 @@ NextInstance:
                     For Each SkinName In {"alex", "ari", "efe", "kai", "makena", "noor", "steve", "sunny", "zuri"}
                         FilesToCompress.Add(
                                 $"assets/minecraft/textures/entity/player/{If(Settings.Get(Of Boolean)("LaunchSkinSlim"), "slim", "wide")}/{SkinName}.png",
-                                Paths.Base & "PCL\CustomSkin_Cliped.png")
+                                Paths.Base & DataFolder & "\CustomSkin_Cliped.png")
                     Next
                 Else
                     FilesToCompress.Add(
                             $"assets/minecraft/textures/entity/{If(Settings.Get(Of Boolean)("LaunchSkinSlim"), "alex.png", "steve.png")}",
-                            Paths.Base & "PCL\CustomSkin_Cliped.png")
+                            Paths.Base & DataFolder & "\CustomSkin_Cliped.png")
                 End If
                 FileUtils.CreateZipFromFiles(ZipFileAddress, FilesToCompress)
-                FileUtils.Delete(Paths.Base & "PCL\CustomSkin_Cliped.png")
+                FileUtils.Delete(Paths.Base & DataFolder & "\CustomSkin_Cliped.png")
                 '更改设置文件
                 IniClearCache(SetupFileAddress)
                 Dim EnabledResourcePack As String = ReadIni(SetupFileAddress, "resourcePacks", "[]").TrimStart("[").TrimEnd("]")
@@ -2022,7 +1993,7 @@ IgnoreCustomSkin:
                 "echo 游戏已退出。" & vbCrLf &
                 "pause"
             FileUtils.Write(
-                filePath:=If(CurrentLaunchOptions.SaveBatch, Paths.Base & "PCL\LatestLaunch.bat"),
+                filePath:=If(CurrentLaunchOptions.SaveBatch, Paths.Base & DataFolder & "\LatestLaunch.bat"),
                 text:=FilterAccessToken(CmdString, "F").Replace("%", "%%"),
                 encoding:=McLaunchEncoding)
             If CurrentLaunchOptions.SaveBatch IsNot Nothing Then

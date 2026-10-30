@@ -327,7 +327,7 @@ PreFin:
     'TODO: 这会不会导致拖拽改变第三方登录的时候版本列表缓存没有更新？
     Public Shared Sub OnVersionServerLoginChanged(Type As Integer)
         If FrmInstanceSetup Is Nothing Then Return
-        WriteIni(McFolderSelected & "PCL.ini", "InstanceCache", "")
+        WriteIni(McFolderSelected & "PCL-Phanes.ini", "InstanceCache", "")
         If PageInstanceLeft.Instance Is Nothing Then Return
         PageInstanceLeft.Instance = New McInstance(PageInstanceLeft.Instance.Name).Load()
         LoaderFolderRun(McInstanceListLoader, McFolderSelected, LoaderFolderRunType.ForceRun, MaxDepth:=1, ExtraPath:="versions\")

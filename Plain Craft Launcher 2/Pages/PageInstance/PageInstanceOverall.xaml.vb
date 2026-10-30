@@ -62,7 +62,7 @@ Public Class PageInstanceOverall
                 PageInstanceLeft.Instance.DisplayType = ReadIni(PageInstanceLeft.Instance.PathVersion & "PCL\Setup.ini", "DisplayType", McInstanceCardType.Auto)
                 FrmInstanceLeft.RefreshModDisabled()
 
-                WriteIni(McFolderSelected & "PCL.ini", "InstanceCache", "") '要求刷新缓存
+                WriteIni(McFolderSelected & "PCL-Phanes.ini", "InstanceCache", "") '要求刷新缓存
                 LoaderFolderRun(McInstanceListLoader, McFolderSelected, LoaderFolderRunType.ForceRun, MaxDepth:=1, ExtraPath:="versions\")
             Catch ex As Exception
                 Logger.Error(ex, $"修改版本分类失败（{PageInstanceLeft.Instance.Name}）")
@@ -79,7 +79,7 @@ Public Class PageInstanceOverall
                     Settings.Set("HintHide", True)
                 End If
                 WriteIni(PageInstanceLeft.Instance.PathVersion & "PCL\Setup.ini", "DisplayType", McInstanceCardType.Hidden)
-                WriteIni(McFolderSelected & "PCL.ini", "InstanceCache", "") '要求刷新缓存
+                WriteIni(McFolderSelected & "PCL-Phanes.ini", "InstanceCache", "") '要求刷新缓存
                 LoaderFolderRun(McInstanceListLoader, McFolderSelected, LoaderFolderRunType.ForceRun, MaxDepth:=1, ExtraPath:="versions\")
             Catch ex As Exception
                 Logger.Error(ex, $"隐藏版本 {PageInstanceLeft.Instance.Name} 失败")
@@ -119,7 +119,7 @@ Public Class PageInstanceOverall
             '刷新与提示
             Hint("重命名成功！", HintType.Green)
             PageInstanceLeft.Instance = NewInstance
-            If Not IsNothing(McInstanceSelected) AndAlso McInstanceSelected.Equals(PageInstanceLeft.Instance) Then WriteIni(McFolderSelected & "PCL.ini", "Version", NewName)
+            If Not IsNothing(McInstanceSelected) AndAlso McInstanceSelected.Equals(PageInstanceLeft.Instance) Then WriteIni(McFolderSelected & "PCL-Phanes.ini", "Version", NewName)
             Reload()
             LoaderFolderRun(McInstanceListLoader, McFolderSelected, LoaderFolderRunType.ForceRun, MaxDepth:=1, ExtraPath:="versions\")
         Catch ex As Exception
@@ -151,7 +151,7 @@ Public Class PageInstanceOverall
             WriteIni(PageInstanceLeft.Instance.PathVersion & "PCL\Setup.ini", "Logo", NewLogo)
             WriteIni(PageInstanceLeft.Instance.PathVersion & "PCL\Setup.ini", "LogoCustom", Not NewLogo = "")
             '刷新显示
-            WriteIni(McFolderSelected & "PCL.ini", "InstanceCache", "") '要求刷新缓存
+            WriteIni(McFolderSelected & "PCL-Phanes.ini", "InstanceCache", "") '要求刷新缓存
             PageInstanceLeft.Instance = New McInstance(PageInstanceLeft.Instance.Name).Load()
             Reload()
             LoaderFolderRun(McInstanceListLoader, McFolderSelected, LoaderFolderRunType.ForceRun, MaxDepth:=1, ExtraPath:="versions\")
