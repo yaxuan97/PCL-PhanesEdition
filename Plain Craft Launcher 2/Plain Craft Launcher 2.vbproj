@@ -694,6 +694,11 @@
   <ItemGroup>
     <Compile Include="Modules\Base\ModAnimation.vb" />
     <Compile Include="Modules\Base\MyBitmap.vb" />
+    <Compile Include="Modules\Mcp\ModMcp.vb" />
+    <Compile Include="Modules\Mcp\McpHttpServer.vb" />
+    <Compile Include="Modules\Mcp\McpProtocol.vb" />
+    <Compile Include="Modules\Mcp\McpTools.vb" />
+    <Compile Include="Modules\Mcp\McpStdioBridge.vb" />
     <Compile Include="Modules\ModMain.vb" />
     <Compile Include="Modules\Base\ModBase.vb" />
     <Compile Include="My Project\AssemblyInfo.vb">

@@ -23,6 +23,14 @@ Public Module ModLaunch
         ''' 额外的启动参数。
         ''' </summary>
         Public ExtraGameArgs As New List(Of String)
+        ''' <summary>
+        ''' 仅用于本次启动的登录信息覆盖。为 Nothing 时按当前登录设置处理。
+        ''' </summary>
+        Public LoginOverride As McLoginData = Nothing
+        ''' <summary>
+        ''' 是否抑制与启动无关的提示（例如正版购买提示）。自动化调用建议开启。
+        ''' </summary>
+        Public SuppressPrompts As Boolean = False
     End Class
     ''' <summary>
     ''' 尝试启动 Minecraft。必须在 UI 线程调用。
@@ -232,8 +240,14 @@ NextInner:
         RunInUiWait(Sub() CheckResult = McLoginAble(McLoginInput()))
         If CheckResult <> "" Then Throw New ArgumentException(CheckResult)
         '正版购买提示
+        Dim EffectiveLoginType As McLoginType = Settings.Get(Of McLoginType)("LoginType")
+        If CurrentLaunchOptions IsNot Nothing AndAlso CurrentLaunchOptions.LoginOverride IsNot Nothing Then
+            EffectiveLoginType = CurrentLaunchOptions.LoginOverride.Type
+        End If
+        Dim SuppressPrompt As Boolean = CurrentLaunchOptions IsNot Nothing AndAlso CurrentLaunchOptions.SuppressPrompts
         If CurrentLaunchOptions?.SaveBatch Is Nothing AndAlso '保存脚本时不提示
-           Not Settings.Get(Of Boolean)("HintBuy") AndAlso Settings.Get(Of McLoginType)("LoginType") <> McLoginType.Ms Then
+           Not SuppressPrompt AndAlso
+           Not Settings.Get(Of Boolean)("HintBuy") AndAlso EffectiveLoginType <> McLoginType.Ms Then
             If Globalization.CultureInfo.CurrentCulture.Name.StartsWithF("zh") OrElse Globalization.CultureInfo.CurrentUICulture.Name.StartsWithF("zh") Then '中文？
                 RunInNewThread(
                 Sub()
@@ -247,7 +261,7 @@ NextInner:
                             End If
                     End Select
                 End Sub, "Buy Minecraft")
-            ElseIf Settings.Get(Of McLoginType)("LoginType") = McLoginType.Legacy Then
+            ElseIf EffectiveLoginType = McLoginType.Legacy Then
                 Select Case MyMsgBox("你必须先登录正版账号，才能进行离线登录！", "正版验证", "购买正版", "试玩", "返回",
                     Button1Action:=Sub() OpenWebsite("https://www.xbox.com/zh-cn/games/store/minecraft-java-bedrock-edition-for-pc/9nxp44l49shj"))
                     Case 2
@@ -352,6 +366,10 @@ NextInner:
         ''' 若采用正版皮肤，则为该皮肤名。
         ''' </summary>
         Public SkinName As String
+        ''' <summary>
+        ''' 是否跳过将本次用户名写入离线用户名历史。
+        ''' </summary>
+        Public SkipHistorySave As Boolean = False
 
         Public Sub New()
             Type = McLoginType.Legacy
@@ -447,6 +465,10 @@ NextInner:
     Public McLoginLoader As New LoaderTask(Of McLoginData, McLoginResult)("登录", AddressOf McLoginStart, AddressOf McLoginInput, ThreadPriority.BelowNormal) With
         {.ReloadTimeout = 1, .ProgressWeight = 15, .Block = False}
     Public Function McLoginInput() As McLoginData
+        'MCP 等调用方可以为单次启动强制指定登录方式，不改变启动器的全局登录设置
+        If CurrentLaunchOptions IsNot Nothing AndAlso CurrentLaunchOptions.LoginOverride IsNot Nothing Then
+            Return CurrentLaunchOptions.LoginOverride
+        End If
         Dim LoginData As McLoginData = Nothing
         Dim LoginType = Settings.Get(Of McLoginType)("LoginType")
         Try
@@ -666,11 +688,13 @@ LoginFinish:
         Data.Output.AccessToken = Data.Output.Uuid
         Data.Output.ClientToken = Data.Output.Uuid
         '保存启动记录
-        Dim Names As New List(Of String)
-        If Not Settings.Get(Of String)("LoginLegacyName") = "" Then Names.AddRange(Settings.Get(Of String)("LoginLegacyName").ToString.Split("¨"))
-        Names.Remove(Input.UserName)
-        Names.Insert(0, Input.UserName)
-        Settings.Set("LoginLegacyName", Names.Join("¨"c))
+        If Not Input.SkipHistorySave Then
+            Dim Names As New List(Of String)
+            If Not Settings.Get(Of String)("LoginLegacyName") = "" Then Names.AddRange(Settings.Get(Of String)("LoginLegacyName").ToString.Split("¨"))
+            Names.Remove(Input.UserName)
+            Names.Insert(0, Input.UserName)
+            Settings.Set("LoginLegacyName", Names.Join("¨"c))
+        End If
     End Sub
 
     'Server 登录：三种验证方式的请求

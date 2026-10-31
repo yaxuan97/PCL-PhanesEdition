@@ -40,6 +40,7 @@
 - **🧩 内容管理**：Mod 启用 / 禁用 / 删除、本地资源扫描、CurseForge 与 Modrinth 搜索。
 - **🩺 运行保障**：崩溃日志规则分析、游戏进程监控、任务管理器。
 - **🎨 界面体验**：自绘 WPF 控件与动画引擎、主题与背景音乐、内置帮助文档。
+- **🤖 AI 接入（MCP）**：内置本地 MCP 服务器，让 Claude Desktop、Cursor、VS Code 等 AI 客户端查询并控制启动器；支持按当前设置、微软正版账号或离线身份启动游戏；默认关闭，支持分级权限、访问令牌与 stdio 桥接。
 
 ## 打磨方向
 
@@ -129,6 +130,7 @@ PCL-PhanesEdition/
 ## 文档
 
 - **[PROJECT_STRUCTURE.md](PROJECT_STRUCTURE.md)** —— 项目结构、模块职责、依赖关系与主要运行链路。
+- **[docs/MCP.md](docs/MCP.md)** —— MCP 服务器启用、客户端配置、工具参考与安全说明。
 - **[MeloongCore/AGENTS.md](MeloongCore/AGENTS.md)** —— 通用核心库自身的开发约定。
 - **[LICENCE](LICENCE)** —— 《PCL 分发有限许可》与《PCL 存储库合理使用指南》。
 

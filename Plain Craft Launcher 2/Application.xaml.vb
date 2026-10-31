@@ -5,6 +5,19 @@ Public Class Application
 
     '开始
     Private Sub Application_Startup(sender As Object, e As StartupEventArgs) Handles Me.Startup
+        'MCP stdio 桥接模式：不初始化 WPF 主界面，只把 stdin/stdout 转发给已运行的启动器
+        If e.Args.Any(Function(a) a = "--mcp" OrElse a = "--mcp-bridge") Then
+            Try
+                MeloongCore.Main.Init("PCL-Phanes")
+                McpStdioBridge.Run()
+            Catch ex As Exception
+                Try
+                    Console.Error.WriteLine("PCL MCP 桥接启动失败：" & ex.ToString())
+                Catch
+                End Try
+            End Try
+            Environment.Exit(0)
+        End If
         Try
             '核心初始化
             MeloongCore.Main.Init(DataFolder)
@@ -274,6 +287,11 @@ RetryCacheCheck:
                         FrmLoginAuth.TextPass.Password = If(Dict.Values.Any, Dict.Values(0), "")
                 End Select
         End Select
+    End Sub
+
+    '退出
+    Private Sub Application_Exit(sender As Object, e As ExitEventArgs) Handles Me.Exit
+        ModMcp.Shutdown()
     End Sub
 
 End Class

@@ -165,6 +165,8 @@ Public Class FormMain
         End Sub, "初始化", ThreadPriority.Lowest)
 
         Logger.Info($"第三阶段加载用时：{GetTimeMs() - ApplicationStartTick} ms")
+        'MCP 服务器（默认关闭；启用后在主窗口加载完成后开始监听）
+        ModMcp.StartIfEnabled()
     End Sub
     '升级与降级事件
     Private Sub UpgradeSub(LastVersionCode As Integer)
@@ -282,6 +284,7 @@ Public Class FormMain
     Public Shared Sub EndProgramForce(Optional ReturnCode As ProcessReturnValues = ProcessReturnValues.Success)
         On Error Resume Next
         IsProgramEnding = True
+        ModMcp.Shutdown()
         AniControlEnabled += 1
         If ReturnCode = ProcessReturnValues.Exception Then
             If Not IsLogShown Then

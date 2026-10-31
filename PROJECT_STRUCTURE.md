@@ -65,6 +65,7 @@ PCL-PhanesEdition/
 │  │  ├─ Base/                       # 网络、动画、加载器、日志、校验、图片
 │  │  ├─ Minecraft/                  # 启动、下载、实例、Java、崩溃分析、进程监控
 │  │  ├─ Resource/                   # 社区资源模型、搜索、本地资源扫描
+│  │  ├─ Mcp/                        # MCP 服务器、JSON-RPC、工具注册表与 stdio 桥接
 │  │  ├─ ThirdParty/                 # 第三方辅助（拖拽等）
 │  │  └─ Mod*.vb                     # 全局功能模块（提示、事件、音乐、密钥、开发钩子）
 │  ├─ Images/                        # 图标、主题、皮肤、头像等图片资源
@@ -178,7 +179,7 @@ Plain Craft Launcher 2 (VB, net48)
 
 | 文件 | 行数（约） | 职责 |
 | --- | ---: | --- |
-| `ModLaunch.vb` | 2,100 | 启动参数构建、JVM/游戏参数、登录凭据、启动脚本、进程启动 |
+| `ModLaunch.vb` | 2,100 | 启动参数构建、JVM/游戏参数、登录凭据、启动脚本、进程启动；`McLaunchOptions.LoginOverride` 支持单次启动的登录方式覆盖（MCP 的离线/正版模式） |
 | `ModMinecraft.vb` | 2,100 | Minecraft 目录、实例/版本元数据、继承版本、文件结构 |
 | `ModDownload.vb` | 1,300 | 原版客户端、依赖库、资源文件等下载任务构建，镜像源排序 |
 | `ModModpack.vb` | 860 | 整合包安装、导出、格式解析（zip/rar/mrpack 等） |
@@ -206,6 +207,18 @@ Plain Craft Launcher 2 (VB, net48)
 | `ModMusic.vb` | 基于 NAudio 的背景音乐播放列表 |
 | `ModDevelop.vb` | 开发版启动钩子（当前为空实现） |
 | `ThirdParty/DragHelper.vb` | 窗口/控件拖拽辅助 |
+
+#### Mcp：AI 接入
+
+| 文件 | 职责 |
+| --- | --- |
+| `Mcp/ModMcp.vb` | MCP 服务器生命周期、设置读取、访问令牌生成、`McpClient.json` 写入/删除 |
+| `Mcp/McpHttpServer.vb` | 基于 `HttpListener` 的回环 HTTP 传输、令牌/Origin 校验、会话与请求限流 |
+| `Mcp/McpProtocol.vb` | JSON-RPC 2.0、MCP `initialize` / `tools/list` / `tools/call` / `ping` |
+| `Mcp/McpTools.vb` | 工具注册表与 22 个工具实现（状态、实例、Mod、设置、启动、导航、资源搜索等） |
+| `Mcp/McpStdioBridge.vb` | `--mcp` 模式：把 stdin/stdout 的 MCP 消息转发给已运行的启动器 |
+
+MCP 默认关闭，只监听 `127.0.0.1`；详细配置与工具说明见 `docs/MCP.md`。
 
 ### 5.4 控件层 `Controls/`
 
@@ -238,13 +251,14 @@ PageLoaderInit(loader, 加载UI, 内容面板, 常驻面板, 输入委托, 完�
 - 设置来源分三类：`Normal`（INI）、`Registry`（`HKEY_CURRENT_USER\Software\PCL-Phanes`）、`Instance`（版本目录下的 `PCL\Setup.ini`）。
 - 敏感项使用 DES 加密，密钥固定为 `PCL-Phanes`。
 - `SettingService` 通过 WPF 附加属性把 XAML 控件的值绑定到设置键，减少页面重复代码。
+- MCP 设置项：`SystemMcpServerEnabled`、`SystemMcpServerPort`、`SystemMcpServerToken`（加密）、`SystemMcpPermission`；修改会触发生命周期回调。
 - 注意：主程序同时存在 **旧 `Settings` 系统（INI/注册表）** 与 **MeloongCore `ConfigEntry` JSON 配置**，PCLCS 使用后者。
 
 ### 5.7 数据与路径
 
 | 内容 | 位置 |
 | --- | --- |
-| 程序旁数据目录 | `<exe 所在目录>\PCL-Phanes\`（Pictures、Musics、Custom.xaml、Logo.png、Help、Log1~5.txt） |
+| 程序旁数据目录 | `<exe 所在目录>\PCL-Phanes\`（Pictures、Musics、Custom.xaml、Logo.png、Help、Log1~5.txt、MCP 启用时的 McpClient.json） |
 | 用户数据目录 | `%APPDATA%\PCL-Phanes\`（自定义皮肤等） |
 | 临时缓存目录 | `%TEMP%\PCL-Phanes\`（可在设置中修改） |
 | 注册表 | `HKEY_CURRENT_USER\Software\PCL-Phanes` |
@@ -361,6 +375,12 @@ msbuild "Plain Craft Launcher 2\Plain Craft Launcher 2.vbproj" -p:Configuration=
 也可以直接用 VS 打开 `Plain Craft Launcher 2.sln` 构建。主项目是旧式非 SDK 工程，建议使用 MSBuild/VS，而不是直接 `dotnet build`。
 
 输出路径：`Plain Craft Launcher 2\bin\Plain Craft Launcher - Phanes Edition.exe`。
+
+MCP 冒烟测试（需先运行启动器并启用 MCP）：
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\docs\mcp-smoke-test.ps1
+```
 
 > 仓库不再包含 CI 工作流；`Resources/Help.zip` 已随仓库提供，不再由流水线生成。
 

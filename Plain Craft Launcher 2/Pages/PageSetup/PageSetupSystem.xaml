@@ -131,6 +131,58 @@
                     </Grid>
                 </Grid>
             </local:MyCard>
+            <local:MyCard Margin="0,0,0,15" Title="AI 接入（MCP）">
+                <Grid Margin="25,40,25,17">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="Name" />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="28" />
+                        <RowDefinition Height="7" />
+                        <RowDefinition Height="28" />
+                        <RowDefinition Height="7" />
+                        <RowDefinition Height="28" />
+                        <RowDefinition Height="7" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <TextBlock Grid.Row="0" VerticalAlignment="Center" HorizontalAlignment="Left" Text="启用状态" Margin="0,0,25,0" />
+                    <local:MyCheckBox x:Name="CheckMcpEnable" Grid.Row="0" Grid.Column="1" Text="启用 MCP 服务器" Height="22" VerticalAlignment="Center"
+                                      local:SettingService.Key="SystemMcpServerEnabled"
+                                      ToolTip="允许外部 AI 客户端通过本机 MCP 服务器读取或控制启动器。&#xa;服务器仅监听 127.0.0.1，并需要访问令牌。" />
+                    <TextBlock Grid.Row="2" VerticalAlignment="Center" HorizontalAlignment="Left" Text="访问权限" Margin="0,0,25,0" />
+                    <local:MyComboBox x:Name="ComboMcpPermission" Grid.Row="2" Grid.Column="1" local:SettingService.Key="SystemMcpPermission"
+                                      ToolTip="只读：仅查询状态。&#xa;标准控制：启动游戏、管理 Mod 与设置。&#xa;完全控制：额外允许删除 Mod 和关闭启动器。">
+                        <local:MyComboBoxItem Content="只读（仅查询状态）" />
+                        <local:MyComboBoxItem Content="标准控制（推荐）" />
+                        <local:MyComboBoxItem Content="完全控制（含删除与关闭）" />
+                    </local:MyComboBox>
+                    <TextBlock Grid.Row="4" VerticalAlignment="Center" HorizontalAlignment="Left" Text="监听端口" Margin="0,0,25,0" />
+                    <local:MyTextBox x:Name="TextMcpPort" Grid.Row="4" Grid.Column="1" local:SettingService.Key="SystemMcpServerPort"
+                                     MaxLength="5" HintText="37821" ToolTip="MCP 服务器监听的本地端口，修改后会立即重启服务器。">
+                        <local:MyTextBox.ValidateRules>
+                            <local:ValidateInteger Min="1024" Max="65535" />
+                        </local:MyTextBox.ValidateRules>
+                    </local:MyTextBox>
+                    <TextBlock Grid.Row="6" VerticalAlignment="Center" HorizontalAlignment="Left" Text="访问令牌" Margin="0,0,25,0" />
+                    <Grid Grid.Row="6" Grid.Column="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <local:MyTextBox x:Name="TextMcpToken" Grid.Column="0" IsReadOnly="True" MaxLength="128" HintText="启用后自动生成" />
+                        <local:MyButton x:Name="BtnMcpCopyToken" Grid.Column="1" Text="复制" MinWidth="60" Padding="10,0" Margin="8,0,0,0" />
+                        <local:MyButton x:Name="BtnMcpRegenToken" Grid.Column="2" Text="重新生成" MinWidth="86" Padding="10,0" Margin="8,0,0,0" />
+                    </Grid>
+                    <TextBlock x:Name="LabMcpStatus" Grid.Row="7" Grid.ColumnSpan="2" Margin="0,10,0,0" TextWrapping="Wrap" Opacity="0.65" />
+                    <StackPanel Grid.Row="8" Grid.ColumnSpan="2" Orientation="Horizontal" Margin="0,12,0,0">
+                        <local:MyButton x:Name="BtnMcpCopyConfig" Text="复制客户端配置" MinWidth="140" Padding="13,0" />
+                    </StackPanel>
+                </Grid>
+            </local:MyCard>
 
             <!-- <local:MyCard x:Name="CardMain" Margin="0,15" Title="全局设置">
                 <StackPanel Margin="25,40,25,15">
