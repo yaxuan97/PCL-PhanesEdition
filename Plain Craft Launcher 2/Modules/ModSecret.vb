@@ -5,9 +5,15 @@ Friend Module ModSecret
     '本项目的注册表位置
     Public Const RegFolder As String = "PCL-Phanes"
     '用于微软登录的 ClientId
+#If PUBLIC_RELEASE Then
+    ' 公开发布版：构建时由环境变量编译注入
+    Public OAuthClientId As String = PublicReleaseSecrets.OAuthClientId
+    'CurseForge API Key（内置值优先，为空时仍可读取环境变量）
+    Public CurseForgeAPIKey As String = If(PublicReleaseSecrets.CurseForgeAPIKey, Environment.GetEnvironmentVariable("PCL_CURSEFORGE_API_KEY"))
+#Else
     Public OAuthClientId As String = If(Environment.GetEnvironmentVariable("PCL_MS_CLIENT_ID"), "")
-    'CurseForge API Key
     Public CurseForgeAPIKey As String = If(Environment.GetEnvironmentVariable("PCL_CURSEFORGE_API_KEY"), "")
+#End If
 
 #Region "网络鉴权"
 

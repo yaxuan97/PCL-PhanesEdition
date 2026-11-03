@@ -112,6 +112,9 @@
     <DefineConstants>RELEASE</DefineConstants>
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(PublicRelease)' == 'true'">
+    <DefineConstants>$(DefineConstants),PUBLIC_RELEASE</DefineConstants>
+  </PropertyGroup>
   <PropertyGroup>
     <SignAssembly>false</SignAssembly>
   </PropertyGroup>
@@ -941,5 +944,12 @@
     <Resource Include="Images\Heads\HerobrineXia.png" />
 
   </ItemGroup>
+  <ItemGroup Condition="'$(PublicRelease)' == 'true'">
+    <Compile Include="obj\PublicRelease\PublicReleaseSecrets.g.vb" />
+  </ItemGroup>
+  <Target Name="CheckPublicReleaseSecrets" BeforeTargets="PrepareForBuild"
+          Condition="'$(PublicRelease)' == 'true' And !Exists('obj\PublicRelease\PublicReleaseSecrets.g.vb')">
+    <Error Text="公开发布版缺少生成的密钥文件 obj\PublicRelease\PublicReleaseSecrets.g.vb。请使用一键编译发布版.bat 构建。" />
+  </Target>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
 </Project>

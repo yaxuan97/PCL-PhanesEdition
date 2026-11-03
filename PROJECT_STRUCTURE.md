@@ -49,6 +49,9 @@
 ```text
 PCL-PhanesEdition/
 ├─ Plain Craft Launcher 2.sln        # VS 解决方案（4 个项目）
+├─ 一键编译.bat                      # 一键编译入口（双击运行）
+├─ 一键编译发布版.bat                # 公开发布版入口（内置 Client ID）
+├─ tools/build/                      # 一键编译的实际构建脚本
 ├─ Plain Craft Launcher 2/           # ★ 主程序（VB.NET / WPF / WinExe）
 │  ├─ Application.xaml(.vb)          # 应用入口、全局资源、启动初始化
 │  ├─ FormMain.xaml(.vb)             # 主窗口、无边框标题栏、页面导航与切换动画
@@ -203,7 +206,7 @@ Plain Craft Launcher 2 (VB, net48)
 | --- | --- |
 | `ModMain.vb` | 全局 UI 辅助：左下角提示（`Hint`）、提示队列与动画；本地日志反馈入口 |
 | `ModEvent.vb` | 自定义事件与附加属性，属于公开 API |
-| `ModSecret.vb` | OAuth Client ID、CurseForge API Key、注册表位置 `PCL-Phanes`、网络 UA、主题色 |
+| `ModSecret.vb` | OAuth Client ID、CurseForge API Key、注册表位置 `PCL-Phanes`、网络 UA、主题色（开发构建运行时读环境变量，公开发布版由构建脚本编译注入） |
 | `ModMusic.vb` | 基于 NAudio 的背景音乐播放列表 |
 | `ModDevelop.vb` | 开发版启动钩子（当前为空实现） |
 | `ThirdParty/DragHelper.vb` | 窗口/控件拖拽辅助 |
@@ -375,6 +378,26 @@ msbuild "Plain Craft Launcher 2\Plain Craft Launcher 2.vbproj" -p:Configuration=
 也可以直接用 VS 打开 `Plain Craft Launcher 2.sln` 构建。主项目是旧式非 SDK 工程，建议使用 MSBuild/VS，而不是直接 `dotnet build`。
 
 输出路径：`Plain Craft Launcher 2\bin\Plain Craft Launcher - Phanes Edition.exe`。
+
+### 一键编译
+
+双击仓库根目录的 `一键编译.bat`（或运行 `.\一键编译.bat [Debug|Release|Snapshot]`）会自动定位 MSBuild、还原依赖、编译并校验产物，并把可直接运行的发行文件整理到：
+
+- `artifacts/output/PCL-Phanes-<版本>-<配置>/`
+- `artifacts/packages/PCL-Phanes-<版本>-<配置>-<时间>.zip`
+- `artifacts/logs/build-<时间>.log`
+
+构建逻辑位于 `tools/build/Build.ps1`，支持 `-Clean`、`-SkipRestore`、`-NoPackage`、`-NoOpen`、`-Run`、`-Help`。脚本会在首次运行、切换配置或检测到输出文件被其他构建更新时自动清理后重新编译；`-Clean` 可强制清理。`artifacts/` 已被 `.gitignore` 忽略。
+
+### 公开发布版
+
+`一键编译发布版.bat` 会读取环境变量 `PCL_MS_CLIENT_ID`（必填）与 `PCL_CURSEFORGE_API_KEY`（可选），通过 `-p:PublicRelease=true` 和 `PUBLIC_RELEASE` 编译常量把值注入 exe：
+
+- 生成文件：`Plain Craft Launcher 2\obj\PublicRelease\PublicReleaseSecrets.g.vb`（位于已忽略的 `obj` 下，不提交）
+- 产物：`artifacts/output/PCL-Phanes-<版本>-PublicRelease/` 与对应 zip
+- 构建脚本会静态校验 exe 中确实包含客户端 ID（以及可选 Key），并在普通/公开构建模式切换时自动清理
+
+普通构建仍然只在应用运行时读取 `PCL_MS_CLIENT_ID` / `PCL_CURSEFORGE_API_KEY`，不内置任何值。
 
 MCP 冒烟测试（需先运行启动器并启用 MCP）：
 

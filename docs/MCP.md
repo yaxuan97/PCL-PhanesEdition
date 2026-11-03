@@ -195,7 +195,7 @@ pcl_launch_game {"instance": "1.20.1", "account_mode": "offline", "offline_usern
 pcl_launch_game {"instance": "1.20.1", "account_mode": "microsoft", "wait": true}
 ```
 
-> 正版模式需要启动器配置了 `PCL_MS_CLIENT_ID`，并且已经登录过微软账号。当前构建如果未配置 Client ID，会返回 `microsoft_login_unavailable`；未登录账号会返回 `microsoft_account_required`。离线模式不依赖微软登录，可直接使用。
+> 正版模式需要启动器可用的微软登录 Client ID（开发构建通过 `PCL_MS_CLIENT_ID` 环境变量提供，公开发布版已由构建脚本内置），并且已经登录过微软账号。当前构建如果未配置 Client ID，会返回 `microsoft_login_unavailable`；未登录账号会返回 `microsoft_account_required`。离线模式不依赖微软登录，可直接使用。
 >
 > 若当前登录方式本身不是离线，或者尚未配置登录，`current` 可能触发启动器的登录界面；AI 无法代替用户完成微软登录或输入密码，此时建议显式使用 `offline`。
 

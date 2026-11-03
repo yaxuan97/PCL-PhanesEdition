@@ -90,6 +90,52 @@ msbuild "Plain Craft Launcher 2\Plain Craft Launcher 2.vbproj" -p:Configuration=
 
 构建产物位于 `Plain Craft Launcher 2\bin\Plain Craft Launcher - Phanes Edition.exe`。
 
+### 一键构建（推荐）
+
+不想记命令时，直接双击仓库根目录的 `一键编译.bat`；它也可以在命令行中运行：
+
+```powershell
+.\一键编译.bat                  # Release（自动判断是否需要清理）
+.\一键编译.bat Debug            # Debug 配置
+.\一键编译.bat Release -Clean   # 强制清理后完整编译
+```
+
+脚本会自动定位 VS 2022 的 MSBuild、还原 NuGet 依赖、编译并校验产物，然后把可直接运行的发行文件整理到 `artifacts/`：
+
+- `artifacts/output/PCL-Phanes-<版本>-<配置>/`：exe 与运行时依赖，可直接双击运行；
+- `artifacts/packages/PCL-Phanes-<版本>-<配置>-<时间>.zip`：发行压缩包；
+- `artifacts/logs/build-<时间>.log`：完整编译日志。
+
+其他参数：`-SkipRestore`、`-NoPackage`、`-NoOpen`、`-Run`、`-Help`。脚本会在首次运行、切换配置或检测到输出文件被其他构建更新时自动清理后重新编译；`-Clean` 可强制清理。CI 或脚本调用时建议加 `-NoOpen`，也可以直接调用 `tools\build\Build.ps1`。`artifacts/` 已被 `.gitignore` 忽略。
+
+### 公开发布版（内置 Microsoft Client ID）
+
+如果希望终端用户**不需要**注册 Microsoft Entra 应用、提交申请或配置环境变量就能使用微软登录，请构建公开发布版：
+
+```powershell
+# 当前终端（临时生效）
+$env:PCL_MS_CLIENT_ID = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+$env:PCL_CURSEFORGE_API_KEY = "..."   # 可选
+.\一键编译发布版.bat
+
+# 双击入口（使用永久环境变量；设置后重开资源管理器/终端）
+setx PCL_MS_CLIENT_ID "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+setx PCL_CURSEFORGE_API_KEY "..."   # 可选
+```
+
+公开发布版会把 `PCL_MS_CLIENT_ID`（必填）和可选的 `PCL_CURSEFORGE_API_KEY` 编译进 exe，产物位于：
+
+- `artifacts/output/PCL-Phanes-<版本>-PublicRelease/`
+- `artifacts/packages/PCL-Phanes-<版本>-PublicRelease-<时间>.zip`
+
+说明：
+
+- `PCL_MS_CLIENT_ID` 必须是 Microsoft Entra 应用的「应用程序（客户端）ID」，不是目录（租户）ID；对应应用需允许公共客户端设备代码流，并具备 `XboxLive.signin` / `offline_access` 权限。
+- 客户端 ID 是公开标识，不是密钥；它会出现在发布产物中，这是 OAuth 公共客户端的正常特性。
+- `PCL_CURSEFORGE_API_KEY` 属于敏感凭据，内置到公开发布产物可能违反 CurseForge 的使用条款且可被提取；如果不希望内置，请在构建前取消该环境变量。未设置时构建仍会成功，只是 CurseForge 相关功能不可用。
+- 构建脚本不会把完整 ID/Key 打印到控制台或日志；生成文件位于已忽略的 `obj\PublicRelease`，发行包只包含运行时文件与 `LICENCE`。
+- 公开发布版与普通构建共用 `bin`，脚本会检测构建模式并自动清理。
+
 ### 运行
 
 ```powershell
@@ -108,6 +154,9 @@ PCL-PhanesEdition/
 │  └─ Plain Craft Launcher 2.vbproj
 ├─ PCLCS/                         # C# 业务辅助库（Java、版本解析、启动工具）
 ├─ MeloongCore/                   # 通用核心库（配置、日志、进度、工具；已内置）
+├─ 一键编译.bat                   # 一键编译入口（双击运行）
+├─ 一键编译发布版.bat             # 公开发布版入口（内置 Client ID）
+├─ tools/build/                   # 一键编译的实际构建脚本
 ├─ PROJECT_STRUCTURE.md           # 完整项目结构分析
 ├─ Plain Craft Launcher 2.sln
 ├─ LICENCE                        # PCL 分发有限许可
